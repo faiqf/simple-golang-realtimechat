@@ -1,0 +1,63 @@
+<html>
+
+<head>
+    <title>Melody example: chatting</title>
+</head>
+
+<style>
+    /* Style for the chat area */
+    #chat {
+        text-align: left;
+        background: #f1f1f1;
+        width: 500px;
+        min-height: 300px;
+        padding: 20px;
+    }
+</style>
+
+<body>
+    <center>
+        <h3>Chat</h3>
+        <!-- Container to display chat messages -->
+        <pre id="chat"></pre>
+        <!-- Input field for user to type messages -->
+        <input placeholder="say something" id="text" type="text">
+    </center>
+
+    <script>
+        // Construct WebSocket URL based on current host
+        var url = "ws://" + window.location.host + "/ws";
+        var ws = new WebSocket(url);
+
+        // Generate a random guest name
+        var name = "Guest" + Math.floor(Math.random() * 1000);
+
+        // Get references to the chat display and text input elements
+        var chat = document.getElementById("chat");
+        var text = document.getElementById("text");
+
+        // Function to get the current time in HH:MM:SS format
+        var now = function () {
+            var iso = new Date().toISOString();
+            return iso.split("T")[1].split(".")[0];
+        };
+
+        // Event handler for receiving messages from the WebSocket
+        ws.onmessage = function (msg) {
+            var line = now() + " " + msg.data + "\n";
+            chat.innerText += line;
+        };
+
+        // Event handler for sending messages when Enter key is pressed
+        text.onkeydown = function (e) {
+            if (e.keyCode === 13 && text.value !== "") {
+                // Send the message through WebSocket
+                ws.send("<" + name + "> " + text.value);
+                // Clear the input field
+                text.value = "";
+            }
+        };
+    </script>
+</body>
+
+</html>
